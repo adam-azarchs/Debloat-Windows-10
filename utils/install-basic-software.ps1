@@ -4,9 +4,9 @@
 # into your default drive's root directory.
 
 $packages = @(
-    "notepadplusplus.install"
-    "peazip.install"
-    #"7zip.install"
+    #"notepadplusplus.install"
+    #"peazip.install"
+    "7zip.install"
     #"aimp"
     #"audacity"
     #"autoit"
@@ -14,27 +14,32 @@ $packages = @(
     #"filezilla"
     #"firefox"
     #"gimp"
+    "git.install"
     #"google-chrome-x64"
     #"imgburn"
     #"keepass.install"
     #"paint.net"
-    #"putty"
+    "putty"
     #"python"
     #"qbittorrent"
     #"speedcrunch"
-    #"sysinternals"
+    "sysinternals"
     #"thunderbird"
     #"vlc"
+    "vim"
     #"windirstat"
     #"wireshark"
 )
 
+$Env:ChocolateyToolsLocation = ("$Env:ProgramFiles(x86)" + "\DevTools")
+HKEY_LOCAL_MACHINE\
+Set-ItemProperty "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Environment" "ChocolateyToolsLocation" $Env:ChocolateyToolsLocation
+
 echo "Setting up Chocolatey software package manager"
-Get-PackageProvider -Name chocolatey -Force
+Set-ExecutionPolicy Bypass -Scope Process -Force; iex ((New-Object System.Net.WebClient).DownloadString('https://chocolatey.org/install.ps1'))
 
 echo "Setting up Full Chocolatey Install"
-Install-Package -Name Chocolatey -Force -ProviderName chocolatey
-$chocopath = (Get-Package chocolatey | ?{$_.Name -eq "chocolatey"} | Select @{N="Source";E={((($a=($_.Source -split "\\"))[0..($a.length - 2)]) -join "\"),"Tools\chocolateyInstall" -join "\"}} | Select -ExpandProperty Source)
+$chocopath = (Get-command choco)
 & $chocopath "upgrade all -y"
 choco install chocolatey-core.extension --force
 
@@ -51,11 +56,11 @@ Register-ScheduledJob @ScheduledJob
 echo "Installing Packages"
 $packages | %{choco install $_ --force -y}
 
-echo "Installing Sysinternals Utilities to C:\Sysinternals"
-$download_uri = "https://download.sysinternals.com/files/SysinternalsSuite.zip"
-$wc = new-object net.webclient
-$wc.DownloadFile($download_uri, "/SysinternalsSuite.zip")
-Add-Type -AssemblyName "system.io.compression.filesystem"
-[io.compression.zipfile]::ExtractToDirectory("/SysinternalsSuite.zip", "/Sysinternals")
-echo "Removing zipfile"
-rm "/SysinternalsSuite.zip"
+#echo "Installing Sysinternals Utilities to C:\Sysinternals"
+#$download_uri = "https://download.sysinternals.com/files/SysinternalsSuite.zip"
+#$wc = new-object net.webclient
+#$wc.DownloadFile($download_uri, "/SysinternalsSuite.zip")
+#Add-Type -AssemblyName "system.io.compression.filesystem"
+#[io.compression.zipfile]::ExtractToDirectory("/SysinternalsSuite.zip", "/Sysinternals")
+#echo "Removing zipfile"
+#rm "/SysinternalsSuite.zip"
